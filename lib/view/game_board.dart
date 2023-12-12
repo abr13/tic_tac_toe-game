@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tic_tac_toe/util/shared_pref.dart';
 
 import '../global/colors.dart';
 
@@ -38,6 +39,21 @@ class _GameBoardState extends State<GameBoard> {
       fontSize: 16,
     ),
   );
+
+  @override
+  void initState() {
+    super.initState();
+
+    getSavedScores();
+  }
+
+  Future<void> getSavedScores() async {
+    if (widget.mode == GameMode.withPerson) {
+      oScore = await LocalMemory.getPlayerOScore();
+      xScore = await LocalMemory.getPlayerXScore();
+      setState(() {});
+    }
+  }
 
   void _tapped(int index) {
     if (!winnerFound && displayXO[index].isEmpty) {
@@ -124,8 +140,14 @@ class _GameBoardState extends State<GameBoard> {
   void _updateScore(String winner) {
     if (winner == 'O') {
       oScore++;
+      if (widget.mode == GameMode.withPerson) {
+        LocalMemory.setPlayerOScore(oScore);
+      }
     } else if (winner == 'X') {
       xScore++;
+      if (widget.mode == GameMode.withPerson) {
+        LocalMemory.setPlayerXScore(xScore);
+      }
     }
     winnerFound = true;
   }
@@ -155,7 +177,7 @@ class _GameBoardState extends State<GameBoard> {
         }
       },
       child: const Text(
-        'Reset',
+        'Restart',
         style: TextStyle(fontSize: 20, color: Colors.black),
       ),
     );
